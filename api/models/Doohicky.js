@@ -13,10 +13,10 @@ module.exports = {
   		required: true
   	},
 
-  /*	alive: {
+  	alive: {
   		type: 'boolean',
   		required: true
-  	} */
+  	} 
   }
 };
 

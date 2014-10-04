@@ -6,6 +6,8 @@
  */
 
 module.exports = {
-	
+	destroy: function(req, res) {
+		console.log()
+	}
 };
 
