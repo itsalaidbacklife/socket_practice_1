@@ -1,13 +1,81 @@
 var socket = io.connect('http://localhost:1337');
 
-//When form is submited, create a new doohicky with the name entered in the form-field and alive status true
+//clear function erases all displayed doohickes
+var clear = function() {
+	$('#doohickies').html('');
+}
+
+//Clears #doohickes, then populates it with .doohicky divs
+var render = function() {
+	console.log('rendering');
+	clear();
+	socket.get('/doohicky', function(res) {
+		if(res.length > 0){
+
+			//console.log(res);
+
+			//Iterate through array of doohickies returned by get request 
+			//and append html tags representing them into thr #doohickies div
+			$.each(res, function(index, val) {
+				$('#doohickies').append("<div class='doohicky' id='" + val.id +"'>" + 'Name: ' + val.name + ' Alive: ' + val.alive + '</div>');
+				console.log('rendered: ');
+				console.log(val);
+			});
+			//Removes event listener from .doohicky.on('click') (because it won't apply to newly added doohickies)
+			$('.doohicky').off('click');
+			//Adds event listener to .doohicky.on('click') to toggle their alive status
+			$('.doohicky').on('click', function(){
+				console.log('Toggle call');
+				toggle_alive($(this));
+			});
+		}
+		else{
+			console.log('No Doohickies!');
+		}
+	});
+}
+
+var toggle_alive = function(div){
+	console.log(div);
+	//Create path to doohicky to be updated
+	var path = "/doohicky/" + div.prop('id');
+	console.log(path);
+	socket.get(path, function(data, jwres){
+		console.log('current doohicky pre-put: ' );
+		console.log(data);
+		socket.put(path, {alive: !data.alive}, function(put_res, put_jwres){
+			console.log('current doohicky post-put: ')
+			console.log(put_res);
+		});
+		
+	});
+
+	//Render doohickes after change
+	//render();
+
+
+}
+
+//////////////////////////////////////
+//Button Clicks and Form Submissions//
+//////////////////////////////////////
+
+//When form is submited, create a new doohicky with the name entered in
+// the form-field and alive status true
 $('#create').submit(function(form){
-	//console.log('Sending Form\n');
 	console.log($('#name_field').val());
 	form.preventDefault();
-	socket.post('/doohicky', {name: $('#name_field').val(), alive: true}, function(resData) {
+	//Post new hoohicky through socket taking name from #name_field div 
+	//and setting alive true
+/*	socket.post('/doohicky', {name: $('#name_field').val(), alive: true}, function(resData) {
+		//Logs response
 		console.log(resData);
-	});
+	}); 
+*/
+	socket.get('/doohicky/create', {name: $('#name_field').val(), alive: true}, function(resData) {
+		//Logs response
+		console.log(resData);
+		});	
 	$('#name_field').val('');
 });
 
@@ -43,3 +111,28 @@ $('#req_button').on('click', function() {
 	});
 });
 
+//Clear displayed doohickies when clear button is clicked
+$('#clear').on('click', function() {
+	console.log('clearing\n');
+	clear();
+});
+
+//Render all doohickies when render button is clicked
+$('#render').on('click', function(){
+	render();
+});
+
+//Subscribe to doohicky class room when subscribe button
+//is clicked
+socket.on('connect', function(){
+	socket.get('/doohicky/subscribe');
+});
+
+////////////////
+//Socket Stuff//
+////////////////
+
+socket.on('doohicky', function(obj){
+	console.log('doohicky created: ' + obj.data);
+	render();
+});
