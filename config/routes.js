@@ -34,7 +34,9 @@ module.exports.routes = {
 
   '/': {
     view: 'homepage'
-  }
+  },
+
+  'PUT /doohicky': 'DoohickyController.update',
 
   /***************************************************************************
   *                                                                          *

@@ -7,7 +7,6 @@ var clear = function() {
 
 //Clears #doohickes, then populates it with .doohicky divs
 var render = function() {
-	console.log('rendering');
 	clear();
 	socket.get('/doohicky', function(res) {
 		if(res.length > 0){
@@ -18,8 +17,7 @@ var render = function() {
 			//and append html tags representing them into thr #doohickies div
 			$.each(res, function(index, val) {
 				$('#doohickies').append("<div class='doohicky' id='" + val.id +"'>" + 'Name: ' + val.name + ' Alive: ' + val.alive + '</div>');
-				console.log('rendered: ');
-				console.log(val);
+				//console.log(val);
 			});
 			//Removes event listener from .doohicky.on('click') (because it won't apply to newly added doohickies)
 			$('.doohicky').off('click');
@@ -133,6 +131,13 @@ socket.on('connect', function(){
 ////////////////
 
 socket.on('doohicky', function(obj){
-	console.log('doohicky created: ' + obj.data);
-	render();
+	if(obj.verb == 'created'){
+		console.log('doohicky created: ' + obj.data);
+		render();
+	}
+
+	if(obj.verb == 'updated'){
+		console.log('doohicky updated: ' + obj.data);
+		render();
+	}
 });
