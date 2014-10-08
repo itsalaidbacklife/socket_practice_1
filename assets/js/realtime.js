@@ -14,7 +14,7 @@ var render = function() {
 			//console.log(res);
 
 			//Iterate through array of doohickies returned by get request 
-			//and append html tags representing them into thr #doohickies div
+			//and append html tags representing them into the #doohickies div
 			$.each(res, function(index, val) {
 				$('#doohickies').append("<div class='doohicky' id='" + val.id +"'>" + 'Name: ' + val.name + ' Alive: ' + val.alive + '</div>');
 				//console.log(val);
@@ -23,8 +23,39 @@ var render = function() {
 			$('.doohicky').off('click');
 			//Adds event listener to .doohicky.on('click') to toggle their alive status
 			$('.doohicky').on('click', function(){
-				console.log('Toggle call');
-				toggle_alive($(this));
+				var req_id = $(this).prop('id');
+				console.log('You clicked div w/ id: ' + req_id);
+
+				//Preserve $(this) div as var div
+				var div = $(this);
+
+				//Confirm that the user wants to toggle alive status of clicked doohicky
+				//with custom confirm messages based on val of alive
+				var path = '/doohicky/' + req_id;
+				console.log('the path is: ' + path);
+				socket.get(path, function(data, jwres){
+					var req_name = data.name;
+					var req_alive = data.alive;
+					//console.log(data);
+					//console.log(req_name + ' ' + req_alive);
+					
+					//If doohicky was alive, ask if user wishes to kill it
+					if(req_alive){
+						var conf = confirm('Are you sure you want to kill ' + req_name + '?');
+						if(conf){
+							toggle_alive(div);
+						}
+					}
+
+					//If doohicky was dead, ask if user wishes to resurrect it
+					else{
+						var conf = confirm('Are you sure you want to resurrect ' + req_name + '?');
+						if(conf){
+							toggle_alive(div);
+						}
+					}
+				});
+				//toggle_alive($(this));
 			});
 		}
 		else{

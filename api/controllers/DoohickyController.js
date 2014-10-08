@@ -29,7 +29,7 @@ module.exports = {
 		console.log('updating id: ' + req_id);
 		console.log(params);
 		if(params.hasOwnProperty('alive')){
-			console.log('It totes has the alive prop: ' + params.alive);
+			//console.log('It totes has the alive prop: ' + params.alive);
 			Doohicky.update(params.id, {alive: params.alive}).exec(
 				function updated(err, newguy){
 					Doohicky.publishUpdate(params.id, {alive: params.alive});
