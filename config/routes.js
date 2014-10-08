@@ -38,6 +38,8 @@ module.exports.routes = {
 
   'PUT /doohicky': 'DoohickyController.update',
 
+  'DELETE /doohicky': 'DoohickyController.destroy',
+
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *
